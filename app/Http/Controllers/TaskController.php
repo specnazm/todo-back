@@ -36,7 +36,6 @@ class TaskController extends Controller
      */
     public function store(TaskRequest $request)
     {
-        
         $user_id = Auth::user()->id;
 
         $task = Task::create(array_merge(['user_id' => $user_id], $request->all()));
@@ -52,7 +51,10 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        return $task;
+        $user_id = Auth::user()->id;
+
+        return $user_id == $task->user_id ? $task : response()->json('Unauthorized action', Response::HTTP_UNAUTHORIZED); 
+        
     }   
 
     /**
@@ -64,7 +66,16 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
-        //
+        $user_id = Auth::user()->id;
+
+        if ($user_id == $task->user_id) {
+            
+            $task->update($request->all());
+            return response()->json(['Edited task' => $task], Response::HTTP_OK);  
+
+        } else {
+            return response()->json('Unauthorized action', Response::HTTP_UNAUTHORIZED); 
+        }
     }
 
     /**
@@ -75,6 +86,15 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        //
+        $user_id = Auth::user()->id;
+
+        if ($user_id == $task->user_id) {
+            
+            $task->delete();
+            return response()->json(['Deleted task' => $task], Response::HTTP_OK);  
+
+        } else {
+            return response()->json('Unauthorized action', Response::HTTP_UNAUTHORIZED); 
+        }
     }
 }
