@@ -10,7 +10,6 @@ use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
 
-
 class TaskController extends Controller
 {
     /**
@@ -21,7 +20,6 @@ class TaskController extends Controller
     public function index()
     {
         $user = Auth::user();
-
         $tasks = DB::table('tasks')->where('user_id', $user->id)->get();
 
         return $tasks;
@@ -37,8 +35,9 @@ class TaskController extends Controller
     public function store(TaskRequest $request)
     {
         $user_id = Auth::user()->id;
-
-        $task = Task::create(array_merge(['user_id' => $user_id], $request->all()));
+        $data = $request->all();
+        $data['user_id']=$user_id;
+        $task = Task::create($data);
     
         return response()->json(['Created task' => $task], Response::HTTP_CREATED); 
     }
@@ -54,7 +53,6 @@ class TaskController extends Controller
         $user_id = Auth::user()->id;
 
         return $user_id == $task->user_id ? $task : response()->json('Unauthorized action', Response::HTTP_UNAUTHORIZED); 
-        
     }   
 
     /**
@@ -67,15 +65,13 @@ class TaskController extends Controller
     public function update(Request $request, Task $task)
     {
         $user_id = Auth::user()->id;
-
         if ($user_id == $task->user_id) {
-            
             $task->update($request->all());
-            return response()->json(['Edited task' => $task], Response::HTTP_OK);  
 
-        } else {
-            return response()->json('Unauthorized action', Response::HTTP_UNAUTHORIZED); 
+            return response()->json(['Edited task' => $task], Response::HTTP_OK);  
         }
+
+        return response()->json('Unauthorized action', Response::HTTP_UNAUTHORIZED); 
     }
 
     /**
@@ -87,14 +83,12 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         $user_id = Auth::user()->id;
-
         if ($user_id == $task->user_id) {
-            
             $task->delete();
-            return response()->json(['Deleted task' => $task], Response::HTTP_OK);  
 
-        } else {
-            return response()->json('Unauthorized action', Response::HTTP_UNAUTHORIZED); 
-        }
+            return response()->json(['Deleted task' => $task], Response::HTTP_OK);  
+        } 
+        
+        return response()->json('Unauthorized action', Response::HTTP_UNAUTHORIZED); 
     }
 }
