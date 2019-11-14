@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Http\Requests\TaskRequest;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
+
 
 class TaskController extends Controller
 {
@@ -17,10 +20,11 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $tasks = DB::table('tasks')->get();
+        $user = Auth::user();
+
+        $tasks = DB::table('tasks')->where('user_id', $user->id)->get();
 
         return $tasks;
-
     }
 
 
@@ -32,15 +36,12 @@ class TaskController extends Controller
      */
     public function store(TaskRequest $request)
     {
-
-        $id = DB::table('tasks')->insertGetId([
-            'title' => $request->title,
-            'description' => $request->description,
-            'priority' => $request->priority,
-            'completed' => $request->completed,
-            'created_at' => Carbon::now()
-        ]);
         
+        $user_id = Auth::user()->id;
+
+        $task = Task::create(array_merge(['user_id' => $user_id], $request->all()));
+    
+        return response()->json(['Created task' => $task], Response::HTTP_CREATED); 
     }
 
     /**
@@ -51,8 +52,6 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-       // $task = DB::table('tasks')->where('id', $id);
-
         return $task;
     }   
 
