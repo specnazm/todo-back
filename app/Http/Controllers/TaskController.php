@@ -51,7 +51,7 @@ class TaskController extends Controller
     public function show(Task $task)
     {
         $user_id = Auth::user()->id;
-
+        
         return $user_id == $task->user_id ? $task : response()->json('Unauthorized action', Response::HTTP_UNAUTHORIZED); 
     }   
 

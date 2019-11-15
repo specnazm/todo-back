@@ -29,7 +29,7 @@ class UserController extends Controller
 
     public function register(UserRequest $request)
     {
-      
+      info($request);
         $validated = $request->validated();
 
         if(!$validated ){
