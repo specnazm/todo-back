@@ -20,9 +20,9 @@ class TaskController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $tasks = DB::table('tasks')->where('user_id', $user->id)->get();
-
-        return $tasks;
+        $tasks = DB::table('tasks')->where('user_id','=', $user->id)->get();
+        
+        return response()->json(['data' => $tasks], Response::HTTP_OK);
     }
 
 

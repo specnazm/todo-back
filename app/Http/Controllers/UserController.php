@@ -15,9 +15,10 @@ class UserController extends Controller
     public function authenticate(Request $request)
     {
         $credentials = $request->only('email', 'password');
-      
+        info($credentials);
         try {
             if (! $token = JWTAuth::attempt($credentials)) {
+                info("usao ovde jbg");
                 return response()->json(['error' => 'invalid_credentials'], 400);
             }
         } catch (JWTException $e) {
@@ -29,9 +30,7 @@ class UserController extends Controller
 
     public function register(UserRequest $request)
     {
-      info($request);
         $validated = $request->validated();
-
         if(!$validated ){
             return response()->json($request->message(), 400);
         }
